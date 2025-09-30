@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Petit Rêve | Tienda de Bebés</title>
+  <meta name="description" content="Productos para bebé con materiales seguros y diseños tiernos. Contacto por WhatsApp o email.">
+  <meta property="og:title" content="Petit Rêve | Tienda de Bebés">
+  <meta property="og:description" content="Productos para bebé con materiales seguros y diseños tiernos. Contacto por WhatsApp o email.">
+  <meta property="og:image" content="assets/hero-poster.jpg">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://petit-reve.example">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body id="top">
+  <header class="site-header" role="banner">
+    <div class="container header-inner">
+      <a class="brand" href="#top" aria-label="Inicio Petit Rêve">
+        <img src="assets/logo.svg" alt="Petit Rêve" width="120" height="40" loading="lazy">
+      </a>
+      <button class="menu-button" type="button" aria-label="Abrir o cerrar menú" aria-controls="site-navigation" aria-expanded="false">
+        <span aria-hidden="true"></span>
+      </button>
+      <nav id="site-navigation" class="site-nav" aria-label="Navegación principal">
+        <ul>
+          <li><a href="#sobre">Sobre</a></li>
+          <li><a href="#porque">Por qué</a></li>
+          <li><a href="#testimonios">Testimonios</a></li>
+          <li><a href="#faqs">FAQs</a></li>
+          <li><a href="#contacto">Contacto</a></li>
+        </ul>
+      </nav>
+      <a class="btn btn-accent header-cta" href="#contacto">Contacto</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-media" aria-hidden="true">
+        <video id="hero-video" class="hero-video" autoplay muted loop playsinline preload="metadata" poster="assets/hero-poster.jpg">
+          <source src="assets/hero.mp4" type="video/mp4">
+          Tu navegador no soporta video HTML5.
+        </video>
+        <div class="hero-overlay" aria-hidden="true"></div>
+      </div>
+      <div class="container hero-content">
+        <h1 id="hero-title">Pequeños momentos, grandes recuerdos</h1>
+        <p>Diseñamos accesorios para bebés que abrazan la suavidad, la seguridad y el amor de cada familia.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="https://wa.me/54911XXXXXXXX?text=Hola%20quiero%20info%20sobre%20cambiadores" target="_blank" rel="noopener">Contactar por WhatsApp</a>
+          <a class="btn btn-secondary" href="#contacto">O escribir un email</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="sobre" class="section" aria-labelledby="sobre-title">
+      <div class="container">
+        <h2 id="sobre-title">Sobre Petit Rêve</h2>
+        <p>En Petit Rêve elegimos materiales certificados, tejidos hipoalergénicos y diseños tiernos que acompañan cada etapa del crecimiento con suavidad y seguridad.</p>
+      </div>
+    </section>
+
+    <section id="porque" class="section alt" aria-labelledby="porque-title">
+      <div class="container">
+        <h2 id="porque-title">Por qué elegirnos</h2>
+        <div class="benefits-grid" role="list">
+          <article class="card" role="listitem">
+            <h3>Seguro</h3>
+            <p>Materiales libres de tóxicos y certificados para estar en contacto con la piel del bebé.</p>
+          </article>
+          <article class="card" role="listitem">
+            <h3>Premium</h3>
+            <p>Acabados artesanales y controles de calidad que cuidan cada detalle.</p>
+          </article>
+          <article class="card" role="listitem">
+            <h3>Hecho con amor</h3>
+            <p>Diseñamos en pequeñas series para dedicar tiempo a cada pieza.</p>
+          </article>
+          <article class="card" role="listitem">
+            <h3>Entrega ágil</h3>
+            <p>Logística pensada para llegar a tiempo a cada bienvenida especial.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="testimonios" class="section" aria-labelledby="testimonios-title">
+      <div class="container">
+        <h2 id="testimonios-title">Testimonios</h2>
+        <div class="carousel" role="region" aria-roledescription="carrusel" aria-label="Opiniones de familias">
+          <div class="carousel-track" role="list">
+            <figure class="slide" role="group" aria-roledescription="diapositiva" aria-label="Testimonio 1 de 4">
+              <blockquote>
+                “El cambiador llegó impecable y con un perfume suave. ¡Mi bebé lo ama!”
+              </blockquote>
+              <figcaption>— Sofía, mamá de Emilia</figcaption>
+            </figure>
+            <figure class="slide" role="group" aria-roledescription="diapositiva" aria-label="Testimonio 2 de 4">
+              <blockquote>
+                “Materiales delicados y fáciles de limpiar. Se nota la dedicación.”
+              </blockquote>
+              <figcaption>— Laura, mamá primeriza</figcaption>
+            </figure>
+            <figure class="slide" role="group" aria-roledescription="diapositiva" aria-label="Testimonio 3 de 4">
+              <blockquote>
+                “La atención fue increíble y la entrega rapidísima. ¡Gracias Petit Rêve!”
+              </blockquote>
+              <figcaption>— Martín, papá de Juli</figcaption>
+            </figure>
+            <figure class="slide" role="group" aria-roledescription="diapositiva" aria-label="Testimonio 4 de 4">
+              <blockquote>
+                “Los estampados son soñados y combinan perfecto con la habitación.”
+              </blockquote>
+              <figcaption>— Camila, mamá de mellizos</figcaption>
+            </figure>
+          </div>
+          <div class="carousel-controls">
+            <button type="button" class="carousel-btn prev" aria-label="Ver testimonio anterior">&#10094;</button>
+            <button type="button" class="carousel-btn next" aria-label="Ver siguiente testimonio">&#10095;</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="faqs" class="section alt" aria-labelledby="faqs-title">
+      <div class="container">
+        <h2 id="faqs-title">Preguntas frecuentes</h2>
+        <div class="faq-list">
+          <details>
+            <summary>¿Qué materiales utilizan?</summary>
+            <p>Trabajamos con telas orgánicas certificadas y rellenos hipoalergénicos libres de ftalatos.</p>
+          </details>
+          <details>
+            <summary>¿Cómo limpio los productos?</summary>
+            <p>Recomendamos lavar a mano o en ciclo suave con agua fría y detergentes neutros.</p>
+          </details>
+          <details>
+            <summary>¿Realizan envíos a todo el país?</summary>
+            <p>Sí, enviamos a todo el país mediante correo certificado con seguimiento.</p>
+          </details>
+          <details>
+            <summary>¿Tienen garantía?</summary>
+            <p>Cada pieza cuenta con 90 días de garantía contra defectos de fabricación.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section id="contacto" class="section" aria-labelledby="contacto-title">
+      <div class="container contact">
+        <h2 id="contacto-title">Contacto</h2>
+        <p class="contact-note">No almacenamos tus datos. El envío se realiza desde tu propio correo.</p>
+        <div class="contact-actions">
+          <a class="btn btn-primary" href="https://wa.me/54911XXXXXXXX?text=Hola%20quiero%20info%20sobre%20cambiadores" target="_blank" rel="noopener">
+            <img src="assets/icons/whatsapp.svg" alt="" aria-hidden="true" width="24" height="24" loading="lazy"> WhatsApp
+          </a>
+          <a class="btn btn-secondary" href="mailto:tucorreo@ejemplo.com?subject=Consulta%20Petit%20R%C3%AAve">
+            <img src="assets/icons/mail.svg" alt="" aria-hidden="true" width="24" height="24" loading="lazy"> Email
+          </a>
+        </div>
+        <form class="contact-form" action="mailto:tucorreo@ejemplo.com" method="post" enctype="text/plain">
+          <label class="visually-hidden" for="empresa">No completar</label>
+          <input type="text" id="empresa" name="empresa" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <div class="form-group">
+            <label for="name">Nombre</label>
+            <input id="name" name="Nombre" type="text" required>
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input id="email" name="Email" type="email" required>
+          </div>
+          <div class="form-group">
+            <label for="message">Mensaje</label>
+            <textarea id="message" name="Mensaje" rows="4" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-accent">Enviar mensaje</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <a class="whatsapp-float" href="https://wa.me/54911XXXXXXXX?text=Hola%20quiero%20info%20sobre%20cambiadores" target="_blank" rel="noopener" aria-label="Abrir WhatsApp Petit Rêve">
+    <img src="assets/icons/whatsapp.svg" alt="" width="32" height="32" aria-hidden="true" loading="lazy">
+  </a>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="container footer-inner">
+      <p>© <span id="year"></span> Petit Rêve · Instagram <a href="https://instagram.com/tuusuario" target="_blank" rel="noopener">@tuusuario</a> · No almacenamos datos personales</p>
+    </div>
+  </footer>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
