@@ -1,149 +1,161 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const yearEl = document.getElementById('year');
+const docReady = (fn) => {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", fn);
+  } else {
+    fn();
+  }
+};
+
+docReady(() => {
+  const yearEl = document.getElementById("year");
   if (yearEl) {
     yearEl.textContent = new Date().getFullYear();
   }
 
-  const hero = document.querySelector('.hero');
-  const menuButton = document.querySelector('.menu-button');
-  const siteNav = document.getElementById('site-navigation');
-  const closeMenu = () => {
-    document.body.classList.remove('nav-open');
-    if (menuButton) {
-      menuButton.setAttribute('aria-expanded', 'false');
-    }
-  };
+  const menuButton = document.querySelector(".menu-button");
+  const siteNav = document.getElementById("site-navigation");
   if (menuButton && siteNav) {
     const toggleMenu = () => {
-      const isOpen = menuButton.getAttribute('aria-expanded') === 'true';
-      if (isOpen) {
-        closeMenu();
-      } else {
-        document.body.classList.add('nav-open');
-        menuButton.setAttribute('aria-expanded', 'true');
-      }
+      const expanded = menuButton.getAttribute("aria-expanded") === "true";
+      menuButton.setAttribute("aria-expanded", String(!expanded));
+      siteNav.classList.toggle("open", !expanded);
     };
-    menuButton.addEventListener('click', toggleMenu);
-    siteNav.querySelectorAll('a').forEach((link) => {
-      link.addEventListener('click', closeMenu);
+
+    menuButton.addEventListener("click", toggleMenu);
+
+    siteNav.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", () => {
+        menuButton.setAttribute("aria-expanded", "false");
+        siteNav.classList.remove("open");
+      });
     });
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') {
-        closeMenu();
-      }
-    });
-    const desktopMq = window.matchMedia('(min-width: 768px)');
-    const handleMq = (event) => {
-      if (event.matches) {
-        closeMenu();
-      }
-    };
-    if (desktopMq.addEventListener) {
-      desktopMq.addEventListener('change', handleMq);
-    } else if (desktopMq.addListener) {
-      desktopMq.addListener(handleMq);
-    }
   }
 
-  const heroVideo = document.getElementById('hero-video');
-  if (hero && heroVideo) {
-    const attemptPlay = heroVideo.play();
+  const video = document.getElementById("hero-video");
+  if (video && typeof video.play === "function") {
+    const attemptPlay = video.play();
     if (attemptPlay !== undefined) {
       attemptPlay.catch(() => {
-        hero.classList.add('hero-fallback');
-        heroVideo.remove();
-      });
-    }
-  } else if (hero) {
-    hero.classList.add('hero-fallback');
-  }
-
-  const carousel = document.querySelector('.carousel');
-  const track = document.querySelector('.carousel-track');
-  const slides = track ? Array.from(track.children) : [];
-  const prevBtn = document.querySelector('.carousel-btn.prev');
-  const nextBtn = document.querySelector('.carousel-btn.next');
-  const intervalTime = 6000;
-  let currentIndex = 0;
-  let autoTimer;
-
-  const updateSlides = () => {
-    slides.forEach((slide, index) => {
-      slide.setAttribute('aria-hidden', index === currentIndex ? 'false' : 'true');
-      slide.setAttribute('tabindex', index === currentIndex ? '0' : '-1');
-      slide.setAttribute('aria-label', `Testimonio ${index + 1} de ${slides.length}`);
-    });
-    if (track) {
-      track.style.transform = `translateX(-${currentIndex * 100}%)`;
-    }
-  };
-
-  const goTo = (index) => {
-    if (!slides.length) return;
-    currentIndex = (index + slides.length) % slides.length;
-    updateSlides();
-  };
-
-  const next = () => goTo(currentIndex + 1);
-  const prev = () => goTo(currentIndex - 1);
-
-  const startAuto = () => {
-    if (autoTimer || !slides.length) return;
-    autoTimer = window.setInterval(next, intervalTime);
-  };
-
-  const stopAuto = () => {
-    if (autoTimer) {
-      window.clearInterval(autoTimer);
-      autoTimer = undefined;
-    }
-  };
-
-  if (slides.length) {
-    updateSlides();
-    startAuto();
-
-    if (nextBtn) {
-      nextBtn.addEventListener('click', () => {
-        stopAuto();
-        next();
-        startAuto();
-      });
-    }
-
-    if (prevBtn) {
-      prevBtn.addEventListener('click', () => {
-        stopAuto();
-        prev();
-        startAuto();
-      });
-    }
-
-    if (carousel) {
-      const pauseEvents = ['mouseenter', 'focusin', 'touchstart'];
-      const resumeEvents = ['mouseleave', 'touchend'];
-
-      pauseEvents.forEach((event) => {
-        carousel.addEventListener(event, stopAuto);
-      });
-      resumeEvents.forEach((event) => {
-        carousel.addEventListener(event, startAuto);
-      });
-      carousel.addEventListener('focusout', () => {
-        if (!carousel.contains(document.activeElement)) {
-          startAuto();
-        }
+        video.parentElement?.classList.add("video-fallback");
+        video.remove();
       });
     }
   }
 
-  const contactForm = document.querySelector('.contact-form');
-  if (contactForm) {
-    contactForm.addEventListener('submit', (event) => {
-      const honeypot = contactForm.querySelector('input[name="empresa"]');
-      if (honeypot && honeypot.value.trim()) {
+  const form = document.querySelector(".contact-form");
+  if (form) {
+    form.addEventListener("submit", (event) => {
+      const honeypot = form.querySelector("[name='empresa']");
+      if (honeypot && honeypot instanceof HTMLInputElement && honeypot.value.trim() !== "") {
         event.preventDefault();
       }
     });
   }
+
+  initCarousel();
 });
+
+function initCarousel() {
+  const carousel = document.querySelector(".carousel");
+  const track = carousel?.querySelector(".carousel-track");
+  const slides = track ? Array.from(track.children) : [];
+  const prevButton = carousel?.querySelector(".carousel-button.prev");
+  const nextButton = carousel?.querySelector(".carousel-button.next");
+  const dotsContainer = carousel?.querySelector(".carousel-dots");
+
+  if (!carousel || !track || slides.length === 0 || !prevButton || !nextButton || !dotsContainer) {
+    return;
+  }
+
+  let currentIndex = 0;
+  let autoAdvanceId = null;
+  let isPaused = false;
+
+  slides.forEach((_, index) => {
+    const dot = document.createElement("button");
+    dot.className = "carousel-dot";
+    dot.type = "button";
+    dot.setAttribute("role", "tab");
+    dot.setAttribute("aria-label", `Ir al testimonio ${index + 1}`);
+    dot.addEventListener("click", () => {
+      goToSlide(index);
+      pauseAutoAdvance();
+    });
+    dotsContainer.appendChild(dot);
+  });
+
+  const dots = Array.from(dotsContainer.children);
+
+  const goToSlide = (index) => {
+    currentIndex = (index + slides.length) % slides.length;
+    const offset = currentIndex * -100;
+    track.style.transform = `translateX(${offset}%)`;
+    slides.forEach((slide, slideIndex) => {
+      slide.setAttribute("aria-hidden", slideIndex !== currentIndex ? "true" : "false");
+      slide.tabIndex = slideIndex === currentIndex ? 0 : -1;
+    });
+    dots.forEach((dot, dotIndex) => {
+      dot.setAttribute("aria-selected", dotIndex === currentIndex ? "true" : "false");
+    });
+  };
+
+  const goToNext = () => {
+    goToSlide(currentIndex + 1);
+  };
+
+  const goToPrev = () => {
+    goToSlide(currentIndex - 1);
+  };
+
+  const startAutoAdvance = () => {
+    stopAutoAdvance();
+    autoAdvanceId = window.setInterval(() => {
+      if (!isPaused) {
+        goToNext();
+      }
+    }, 6000);
+  };
+
+  const stopAutoAdvance = () => {
+    if (autoAdvanceId !== null) {
+      window.clearInterval(autoAdvanceId);
+      autoAdvanceId = null;
+    }
+  };
+
+  const pauseAutoAdvance = () => {
+    isPaused = true;
+    window.setTimeout(() => {
+      isPaused = false;
+    }, 8000);
+  };
+
+  prevButton.addEventListener("click", () => {
+    goToPrev();
+    pauseAutoAdvance();
+  });
+
+  nextButton.addEventListener("click", () => {
+    goToNext();
+    pauseAutoAdvance();
+  });
+
+  carousel.addEventListener("mouseenter", () => {
+    isPaused = true;
+  });
+
+  carousel.addEventListener("mouseleave", () => {
+    isPaused = false;
+  });
+
+  carousel.addEventListener("focusin", () => {
+    isPaused = true;
+  });
+
+  carousel.addEventListener("focusout", () => {
+    isPaused = false;
+  });
+
+  goToSlide(0);
+  startAutoAdvance();
+}
