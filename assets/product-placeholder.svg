@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800" role="img" aria-labelledby="title desc">
+  <title id="title">Marcador de imagen de producto Petit Rêve</title>
+  <desc id="desc">Fondo pastel con ilustraciones suaves para representar una foto de producto de ropa de bebé.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#f7cfe0" />
+      <stop offset="1" stop-color="#b7dffc" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="800" fill="url(#bg)" rx="60" />
+  <g opacity="0.2">
+    <circle cx="180" cy="180" r="80" fill="#ffffff" />
+    <circle cx="620" cy="240" r="110" fill="#ffffff" />
+    <circle cx="400" cy="600" r="150" fill="#ffffff" />
+  </g>
+  <g fill="#44313c">
+    <path d="M258 512l96-128 68 92 80-112 144 196H258z" fill-opacity="0.12" />
+    <rect x="180" y="260" width="440" height="280" rx="48" fill="none" stroke="#44313c" stroke-width="8" stroke-dasharray="20 20" />
+    <circle cx="320" cy="350" r="46" fill="none" stroke="#44313c" stroke-width="8" stroke-dasharray="14 14" />
+  </g>
+  <text x="50%" y="680" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="48" fill="#44313c" opacity="0.7">Foto producto</text>
+</svg>
