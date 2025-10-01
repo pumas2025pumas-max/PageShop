@@ -510,7 +510,6 @@ img {
   font-size: 0.9rem;
   color: var(--color-muted);
 }
-
 .card {
   background: var(--color-surface);
   padding: 1.75rem;
@@ -771,7 +770,6 @@ textarea:focus {
   .benefits-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
-
   .collection-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
