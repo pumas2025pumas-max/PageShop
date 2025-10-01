@@ -35,6 +35,13 @@
     </div>
   </header>
 
+  <div id="discount-banner" class="discount-banner" role="status" aria-live="polite" hidden>
+    <div class="discount-banner__content">
+      <span>¡Ganaste! Tenés 5% OFF en tu compra. Usá el código <strong>SUEÑO5</strong>.</span>
+      <button type="button" class="discount-banner__close" aria-label="Ocultar mensaje de descuento">&times;</button>
+    </div>
+  </div>
+
   <main>
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero-media" aria-hidden="true">
@@ -510,6 +517,21 @@
       <p>© <span id="year"></span> Petit Rêve · Instagram <a href="https://instagram.com/tuusuario" target="_blank" rel="noopener">@tuusuario</a> · No almacenamos datos personales</p>
     </div>
   </footer>
+
+  <div id="mini-game" class="mini-game" aria-hidden="true">
+    <div class="mini-game__overlay" data-mini-game-close="true"></div>
+    <div class="mini-game__dialog" role="dialog" aria-modal="true" aria-labelledby="mini-game-title" aria-describedby="mini-game-description" tabindex="-1">
+      <button type="button" class="mini-game__close" data-mini-game-close="true" aria-label="Cerrar mini juego">&times;</button>
+      <h2 id="mini-game-title">Juego de las estrellas</h2>
+      <p id="mini-game-description">Elegí una estrella y descubrí si desbloqueás un 5% de descuento para tu compra.</p>
+      <div class="mini-game__choices" role="list">
+        <button type="button" class="mini-game__choice" data-choice="0" role="listitem">Estrella 1</button>
+        <button type="button" class="mini-game__choice" data-choice="1" role="listitem">Estrella 2</button>
+        <button type="button" class="mini-game__choice" data-choice="2" role="listitem">Estrella 3</button>
+      </div>
+      <p id="mini-game-status" class="mini-game__status" role="status" aria-live="polite"></p>
+    </div>
+  </div>
 
   <script src="script.js" defer></script>
 </body>
