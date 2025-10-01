@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Uy, esta nube se escapó | Petit Rêve</title>
+  <meta name="description" content="Página no encontrada. Probá el minijuego Saltito Nuboso y volvé a la tienda de Petit Rêve.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="error-page">
+  <main class="error-page__content" role="main">
+    <section class="error-hero" aria-labelledby="error-title">
+      <div class="error-hero__text">
+        <p class="error-hero__code" aria-hidden="true">404</p>
+        <h1 id="error-title">Uy, la prenda que buscás está en otra nube</h1>
+        <p>Mientras la encontramos, jugá un rato con nuestro minijuego <strong>Saltito Nuboso</strong>. Saltá las cajas de telas y llegá lo más lejos que puedas.</p>
+        <div class="error-hero__actions">
+          <a class="btn btn-primary" href="index.html">Volver al inicio</a>
+          <button type="button" class="btn btn-secondary" id="error-game-start">Comenzar a jugar</button>
+        </div>
+      </div>
+      <div class="error-hero__mascot" aria-hidden="true">
+        <div class="error-cloud"></div>
+        <div class="error-balloon"></div>
+      </div>
+    </section>
+
+    <section class="error-game" aria-label="Minijuego Saltito Nuboso">
+      <div class="error-game__wrapper" role="application" aria-describedby="game-instructions">
+        <header class="error-game__hud">
+          <p id="game-instructions">Usá la barra espaciadora, la flecha hacia arriba o tocá la pantalla para saltar. Evitá los obstáculos y superá tu récord.</p>
+          <div class="error-game__scores" aria-live="polite" aria-atomic="true">
+            <span>Puntaje: <strong id="error-game-score">0</strong></span>
+            <span>Récord: <strong id="error-game-best">0</strong></span>
+          </div>
+        </header>
+        <canvas id="error-game-canvas" width="720" height="260" role="presentation" aria-hidden="true"></canvas>
+        <div class="error-game__message" id="error-game-message" role="status" aria-live="assertive"></div>
+      </div>
+    </section>
+  </main>
+  <footer class="error-footer">
+    <p>&copy; <span id="error-year"></span> Petit Rêve. Moda suave para peques felices.</p>
+  </footer>
+  <script src="error-game.js" defer></script>
+</body>
+</html>
