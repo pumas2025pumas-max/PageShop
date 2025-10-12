@@ -23,6 +23,13 @@ const seed = {
 
 let state = loadState();
 let saveTimer = null;
+let productSort = 'name-asc';
+let ingredientSort = { field: 'nombre', direction: 'asc' };
+const insightsCache = {
+  productos: { value: null, sub: null },
+  ingredientes: { value: null, sub: null },
+  costo: { value: null, sub: null }
+};
 
 function uid() {
   return `id-${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -44,6 +51,51 @@ const moneyFormatter = new Intl.NumberFormat('es-AR', {
 
 function formatMoney(value) {
   return moneyFormatter.format(value || 0);
+}
+
+function escapeHtml(text) {
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function highlightMatch(text, query) {
+  if (!query) return escapeHtml(text);
+  const safeText = escapeHtml(text);
+  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'ig');
+  return safeText.replace(regex, '<mark>$1</mark>');
+}
+
+function triggerInsightPulse(card) {
+  if (!card) return;
+  card.classList.remove('bump');
+  void card.offsetWidth;
+  card.classList.add('bump');
+}
+
+function updateInsightCard(key, valueText, subText) {
+  const valueEl = document.getElementById(`insight${key.charAt(0).toUpperCase()}${key.slice(1)}`);
+  const subEl = document.getElementById(`insight${key.charAt(0).toUpperCase()}${key.slice(1)}Sub`);
+  const cache = insightsCache[key];
+  if (!valueEl || !subEl || !cache) return;
+
+  if (cache.value !== valueText) {
+    cache.value = valueText;
+    valueEl.textContent = valueText;
+    triggerInsightPulse(valueEl.closest('.insight-card'));
+  } else {
+    valueEl.textContent = valueText;
+  }
+
+  if (cache.sub !== subText) {
+    cache.sub = subText;
+    subEl.textContent = subText;
+  } else {
+    subEl.textContent = subText;
+  }
 }
 
 function loadState() {
@@ -119,11 +171,42 @@ function getSelectedProduct() {
 function renderProductsList() {
   const list = document.getElementById('productList');
   list.innerHTML = '';
-  const search = document.getElementById('productSearch').value.trim().toLowerCase();
+  const searchInput = document.getElementById('productSearch');
+  const searchRaw = searchInput.value.trim();
+  const search = searchRaw.toLowerCase();
+  const sortSelect = document.getElementById('productSort');
+  if (sortSelect && sortSelect.value !== productSort) {
+    sortSelect.value = productSort;
+  }
   const ingredientsMap = new Map(state.ingredientes.map((ing) => [ing.id, ing]));
   const filtered = state.productos.filter((prod) => prod.nombre.toLowerCase().includes(search));
 
-  if (!filtered.length) {
+  const decorated = filtered.map((prod) => {
+    const costUnit = costoUnidad(prod, ingredientsMap);
+    const tandaCost = costoTanda(prod, ingredientsMap);
+    return {
+      prod,
+      costUnit,
+      tandaCost,
+      components: prod.componentes.length
+    };
+  });
+
+  decorated.sort((a, b) => {
+    switch (productSort) {
+      case 'name-desc':
+        return b.prod.nombre.localeCompare(a.prod.nombre, 'es', { sensitivity: 'base' });
+      case 'cost-asc':
+        return a.costUnit - b.costUnit;
+      case 'cost-desc':
+        return b.costUnit - a.costUnit;
+      case 'name-asc':
+      default:
+        return a.prod.nombre.localeCompare(b.prod.nombre, 'es', { sensitivity: 'base' });
+    }
+  });
+
+  if (!decorated.length) {
     const empty = document.createElement('div');
     empty.className = 'empty-state';
     empty.textContent = 'No hay productos. Crea uno nuevo para comenzar.';
@@ -131,21 +214,29 @@ function renderProductsList() {
     return;
   }
 
-  filtered.forEach((prod) => {
+  decorated.forEach(({ prod, costUnit, tandaCost, components }) => {
     const item = document.createElement('button');
     item.type = 'button';
     item.className = `product-item${prod.id === state.seleccionado?.productoId ? ' active' : ''}`;
     item.setAttribute('role', 'option');
     item.setAttribute('aria-selected', prod.id === state.seleccionado?.productoId);
 
-    const left = document.createElement('div');
-    left.innerHTML = `<strong>${prod.nombre}</strong>`;
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+    const highlightedName = highlightMatch(prod.nombre, searchRaw);
+    const componentLabel = `${components || 0} ${components === 1 ? 'ingrediente' : 'ingredientes'}`;
+    const outputLabel = `${prod.cantidad_salida} ${prod.unidad_salida || 'u'}`.trim();
+    meta.innerHTML = `
+      <span class="title">${highlightedName}</span>
+      <small>${componentLabel} · ${formatMoney(tandaCost)} la tanda · ${outputLabel}</small>
+    `;
 
     const cost = document.createElement('span');
     cost.className = 'cost';
-    cost.textContent = formatMoney(costoUnidad(prod, ingredientsMap));
+    cost.textContent = formatMoney(costUnit);
 
-    item.append(left, cost);
+    item.title = `Costo por unidad: ${formatMoney(costUnit)}`;
+    item.append(meta, cost);
     item.addEventListener('click', () => selectProduct(prod.id));
     list.appendChild(item);
   });
@@ -225,6 +316,7 @@ function renderProductDetail() {
       </div>
       <p class="message" id="componentMessage" role="alert"></p>
     </form>
+    <section class="card component-insights" id="componentInsights" aria-live="polite"></section>
   `;
 
   const productForm = document.getElementById('productForm');
@@ -284,6 +376,59 @@ function renderProductDetail() {
       document.getElementById('componentMessage').textContent = '';
     }
   });
+
+  renderComponentInsights(product, ingredientsMap, tanda);
+}
+
+function renderComponentInsights(product, ingredientsMap, tanda) {
+  const container = document.getElementById('componentInsights');
+  if (!container) return;
+
+  if (!product.componentes.length) {
+    container.innerHTML = '<p class="empty">Agrega ingredientes para analizar su impacto.</p>';
+    return;
+  }
+
+  const breakdown = product.componentes
+    .map((comp) => {
+      const ing = ingredientsMap.get(comp.ingrediente_id);
+      if (!ing) return null;
+      const lineCost = comp.cantidad_uso * ing.costo_por_unidad;
+      const percentage = tanda > 0 ? (lineCost / tanda) * 100 : 0;
+      return {
+        nombre: ing.nombre,
+        lineCost,
+        percentage
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.lineCost - a.lineCost);
+
+  if (!breakdown.length) {
+    container.innerHTML = '<p class="empty">Los ingredientes eliminados no se incluyen en el análisis.</p>';
+    return;
+  }
+
+  const listItems = breakdown
+    .map(
+      (item) => `
+        <li>
+          <div class="label-row">
+            <strong>${escapeHtml(item.nombre)}</strong>
+            <span>${formatMoney(item.lineCost)} · ${item.percentage.toFixed(1)}%</span>
+          </div>
+          <div class="progress" role="presentation">
+            <div class="progress-bar" style="transform: scaleX(${Math.min(1, item.percentage / 100)});"></div>
+          </div>
+        </li>
+      `
+    )
+    .join('');
+
+  container.innerHTML = `
+    <h3>Impacto de componentes</h3>
+    <ul>${listItems}</ul>
+  `;
 }
 
 function handleProductFormChange() {
@@ -387,10 +532,23 @@ function renderIngredients() {
     td.textContent = 'Aún no hay ingredientes';
     tr.appendChild(td);
     tbody.appendChild(tr);
+    updateIngredientSortHeaders();
     return;
   }
 
-  state.ingredientes.forEach((ing) => {
+  const sorted = [...state.ingredientes].sort((a, b) => {
+    const { field, direction } = ingredientSort;
+    if (field === 'costo_por_unidad') {
+      const diff = (a.costo_por_unidad || 0) - (b.costo_por_unidad || 0);
+      return direction === 'asc' ? diff : -diff;
+    }
+    const valueA = (a[field] || '').toString().toLowerCase();
+    const valueB = (b[field] || '').toString().toLowerCase();
+    const result = valueA.localeCompare(valueB, 'es', { sensitivity: 'base' });
+    return direction === 'asc' ? result : -result;
+  });
+
+  sorted.forEach((ing) => {
     const tr = document.createElement('tr');
     tr.tabIndex = 0;
     tr.innerHTML = `
@@ -405,6 +563,18 @@ function renderIngredients() {
       }
     });
     tbody.appendChild(tr);
+  });
+
+  updateIngredientSortHeaders();
+}
+
+function updateIngredientSortHeaders() {
+  document.querySelectorAll('.sort-header').forEach((button) => {
+    if (button.dataset.field === ingredientSort.field) {
+      button.dataset.direction = ingredientSort.direction;
+    } else {
+      delete button.dataset.direction;
+    }
   });
 }
 
@@ -484,6 +654,59 @@ function deleteIngredient() {
 
   showToast('Ingrediente eliminado');
   clearIngredientForm();
+}
+
+function handleIngredientSort(field) {
+  if (ingredientSort.field === field) {
+    ingredientSort = {
+      field,
+      direction: ingredientSort.direction === 'asc' ? 'desc' : 'asc'
+    };
+  } else {
+    ingredientSort = {
+      field,
+      direction: field === 'costo_por_unidad' ? 'desc' : 'asc'
+    };
+  }
+  renderIngredients();
+}
+
+function renderInsightsBar() {
+  const bar = document.getElementById('insightsBar');
+  if (!bar) return;
+
+  const productosCount = state.productos.length;
+  const productosSub = productosCount
+    ? `${productosCount === 1 ? 'Producto disponible' : 'Productos disponibles'}`
+    : 'Sin registros';
+  updateInsightCard('productos', String(productosCount), productosSub);
+
+  const ingredientesCount = state.ingredientes.length;
+  const ingredientesSub = ingredientesCount
+    ? `${ingredientesCount === 1 ? 'Ingrediente activo' : 'Ingredientes activos'}`
+    : 'Sin registros';
+  updateInsightCard('ingredientes', String(ingredientesCount), ingredientesSub);
+
+  const ingredientsMap = new Map(state.ingredientes.map((ing) => [ing.id, ing]));
+  const costos = state.productos
+    .map((prod) => costoUnidad(prod, ingredientsMap))
+    .filter((value) => Number.isFinite(value) && value >= 0);
+
+  if (!costos.length) {
+    updateInsightCard('costo', formatMoney(0), 'Crea productos para ver métricas');
+    return;
+  }
+
+  const total = costos.reduce((acc, value) => acc + value, 0);
+  const promedio = total / costos.length;
+  const minimo = Math.min(...costos);
+  const maximo = Math.max(...costos);
+  const subMensaje =
+    minimo === maximo
+      ? `Valor estable en ${formatMoney(minimo)}`
+      : `Rango ${formatMoney(minimo)} – ${formatMoney(maximo)}`;
+
+  updateInsightCard('costo', formatMoney(promedio), subMensaje);
 }
 
 function createProduct() {
@@ -596,11 +819,40 @@ function handleGlobalShortcuts(event) {
         message.textContent = '';
       }
     }
+    return;
+  }
+
+  const target = event.target;
+  const tag = target?.tagName?.toLowerCase();
+  if (tag === 'input' || tag === 'textarea' || tag === 'select' || target?.isContentEditable) {
+    return;
+  }
+
+  const key = event.key.toLowerCase();
+  if (key === 'n') {
+    event.preventDefault();
+    createProduct();
+  }
+  if (key === 'd') {
+    event.preventDefault();
+    duplicateSelectedProduct();
+  }
+  if (key === 'f' || event.key === '/') {
+    event.preventDefault();
+    document.getElementById('productSearch').focus();
+  }
+  if (key === 'i') {
+    event.preventDefault();
+    document.getElementById('ingredientName').focus();
   }
 }
 
 function setupEvents() {
   document.getElementById('productSearch').addEventListener('input', renderProductsList);
+  document.getElementById('productSort').addEventListener('change', (event) => {
+    productSort = event.target.value;
+    renderProductsList();
+  });
   document.getElementById('newProductBtn').addEventListener('click', createProduct);
   document.getElementById('deleteProductBtn').addEventListener('click', deleteSelectedProduct);
   document.getElementById('duplicateProductBtn').addEventListener('click', duplicateSelectedProduct);
@@ -613,6 +865,13 @@ function setupEvents() {
       event.preventDefault();
       clearIngredientForm();
     }
+  });
+
+  document.querySelectorAll('.sort-header').forEach((button) => {
+    button.addEventListener('click', () => {
+      handleIngredientSort(button.dataset.field);
+      updateIngredientSortHeaders();
+    });
   });
 
   document.getElementById('exportBtn').addEventListener('click', exportState);
@@ -672,6 +931,7 @@ function render() {
   ensureSelection();
   renderProductsList();
   renderProductDetail();
+  renderInsightsBar();
   renderIngredients();
   updateButtonsState();
   updatePanelsForViewport();

@@ -17,6 +17,24 @@
     </div>
   </header>
 
+  <section class="insights-bar" id="insightsBar" aria-live="polite">
+    <article class="insight-card" data-type="productos">
+      <span class="insight-title">Productos</span>
+      <strong class="insight-value" id="insightProductos">0</strong>
+      <p class="insight-sub" id="insightProductosSub">Sin registros</p>
+    </article>
+    <article class="insight-card" data-type="ingredientes">
+      <span class="insight-title">Ingredientes</span>
+      <strong class="insight-value" id="insightIngredientes">0</strong>
+      <p class="insight-sub" id="insightIngredientesSub">Sin registros</p>
+    </article>
+    <article class="insight-card" data-type="costos">
+      <span class="insight-title">Costo promedio/u</span>
+      <strong class="insight-value" id="insightCosto">$ 0,00</strong>
+      <p class="insight-sub" id="insightCostoSub">Crea productos para ver métricas</p>
+    </article>
+  </section>
+
   <div class="mobile-tabs" id="mobileTabs">
     <button data-target="productos" class="active">Productos</button>
     <button data-target="detalle">Detalle</button>
@@ -32,13 +50,22 @@
           <button class="btn btn-danger" id="deleteProductBtn">Eliminar</button>
         </div>
       </div>
-      <input
-        type="search"
-        class="search-input"
-        id="productSearch"
-        placeholder="Buscar producto"
-        aria-label="Buscar producto"
-      />
+      <div class="list-toolbar">
+        <label class="sr-only" for="productSearch">Buscar producto</label>
+        <input
+          type="search"
+          class="search-input"
+          id="productSearch"
+          placeholder="Buscar producto"
+          aria-label="Buscar producto"
+        />
+        <select id="productSort" class="sort-select" aria-label="Ordenar productos">
+          <option value="name-asc">Nombre (A-Z)</option>
+          <option value="name-desc">Nombre (Z-A)</option>
+          <option value="cost-asc">Costo/u (menor a mayor)</option>
+          <option value="cost-desc">Costo/u (mayor a menor)</option>
+        </select>
+      </div>
       <div class="product-list" id="productList" role="listbox" aria-label="Lista de productos"></div>
       <button class="btn btn-primary" id="newProductBtn">Nuevo producto</button>
     </section>
@@ -59,9 +86,9 @@
         <table>
           <thead>
             <tr>
-              <th>Nombre</th>
-              <th>Unidad</th>
-              <th>Costo/u</th>
+              <th><button type="button" class="sort-header" data-field="nombre">Nombre</button></th>
+              <th><button type="button" class="sort-header" data-field="unidad">Unidad</button></th>
+              <th><button type="button" class="sort-header" data-field="costo_por_unidad">Costo/u</button></th>
             </tr>
           </thead>
           <tbody id="ingredientsTable"></tbody>
