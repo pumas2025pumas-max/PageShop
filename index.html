@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestor de Costos</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>Gestor de Costos</h1>
+    <div class="header-actions">
+      <button class="btn btn-secondary" id="exportBtn">Exportar JSON</button>
+      <label class="btn btn-secondary" for="importInput" role="button">Importar JSON</label>
+      <input type="file" id="importInput" accept="application/json" hidden />
+      <button class="btn btn-danger" id="resetBtn">Reiniciar</button>
+    </div>
+  </header>
+
+  <div class="mobile-tabs" id="mobileTabs">
+    <button data-target="productos" class="active">Productos</button>
+    <button data-target="detalle">Detalle</button>
+    <button data-target="ingredientes">Ingredientes</button>
+  </div>
+
+  <main class="layout">
+    <section class="card panel" id="productosPanel">
+      <div class="section-title">
+        <h2 class="sidebar-title">Productos</h2>
+        <div class="table-actions">
+          <button class="btn btn-secondary" id="duplicateProductBtn">Duplicar</button>
+          <button class="btn btn-danger" id="deleteProductBtn">Eliminar</button>
+        </div>
+      </div>
+      <input
+        type="search"
+        class="search-input"
+        id="productSearch"
+        placeholder="Buscar producto"
+        aria-label="Buscar producto"
+      />
+      <div class="product-list" id="productList" role="listbox" aria-label="Lista de productos"></div>
+      <button class="btn btn-primary" id="newProductBtn">Nuevo producto</button>
+    </section>
+
+    <section class="card panel" id="detallePanel">
+      <div class="section-title">
+        <h2>Detalle del producto</h2>
+        <span class="tag" id="detalleTag">Sin seleccionar</span>
+      </div>
+      <div id="productDetail" aria-live="polite"></div>
+    </section>
+
+    <section class="card panel" id="ingredientesPanel">
+      <div class="section-title">
+        <h2 class="sidebar-title">Ingredientes</h2>
+      </div>
+      <div class="table-wrapper" aria-live="polite">
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Unidad</th>
+              <th>Costo/u</th>
+            </tr>
+          </thead>
+          <tbody id="ingredientsTable"></tbody>
+        </table>
+      </div>
+      <form id="ingredientForm" class="form-grid" autocomplete="off">
+        <input type="hidden" id="ingredientId" />
+        <div class="form-row">
+          <label for="ingredientName">Nombre</label>
+          <input type="text" id="ingredientName" required />
+        </div>
+        <div class="form-row">
+          <label for="ingredientUnit">Unidad</label>
+          <input type="text" id="ingredientUnit" />
+        </div>
+        <div class="form-row">
+          <label for="ingredientCost">Costo por unidad</label>
+          <input type="text" id="ingredientCost" required />
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Guardar ingrediente</button>
+          <button type="button" class="btn btn-secondary" id="ingredientClearBtn">Limpiar</button>
+          <button type="button" class="btn btn-danger" id="ingredientDeleteBtn" disabled>Eliminar</button>
+        </div>
+        <p class="message" id="ingredientMessage" role="alert"></p>
+      </form>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
