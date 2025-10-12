@@ -42,7 +42,20 @@ class Producto:
     nombre: str = "Nuevo producto"
     unidades_por_tanda: int = 1
     ingredientes: List[IngredienteDeProducto] = field(default_factory=list)
-    precio_final_manual: float = 0.0
+    kwh: float = 0.0
+    tarifa_kwh: float = 0.0
+    m3_gas: float = 0.0
+    tarifa_m3_gas: float = 0.0
+    horas: float = 0.0
+    tarifa_hora: float = 0.0
+    cargas_sociales_pct: float = 0.0
+    empaque_unitario: float = 0.0
+    otros_por_tanda: float = 0.0
+    merma_pct: float = 0.0
+    margen_pct: float = 0.0
+    iva_pct: float = 0.0
+    otros_impuestos_pct: float = 0.0
+    redondeo: float = 0.0
 
     def costo_ingredientes(self, catalogo: List[Insumo]) -> float:
         lookup = {insumo.nombre: insumo for insumo in catalogo}
