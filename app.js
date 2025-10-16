@@ -127,9 +127,50 @@ function scheduleSave() {
 
 function setState(updater) {
   const nextState = typeof updater === 'function' ? updater(state) : updater;
+
+  const activeElement = document.activeElement;
+  const shouldPreserve =
+    activeElement &&
+    activeElement.hasAttribute('data-preserve-focus') &&
+    typeof activeElement.id === 'string' &&
+    activeElement.id.length > 0;
+  const activeId = shouldPreserve ? activeElement.id : null;
+  let selection = null;
+  if (shouldPreserve) {
+    try {
+      const { selectionStart, selectionEnd } = activeElement;
+      if (typeof selectionStart === 'number' && typeof selectionEnd === 'number') {
+        selection = { start: selectionStart, end: selectionEnd };
+      }
+    } catch (_) {
+      selection = null;
+    }
+  }
+
   state = nextState;
   scheduleSave();
   render();
+
+  if (!activeId) {
+    return;
+  }
+
+  const element = document.getElementById(activeId);
+  if (!element || typeof element.focus !== 'function') {
+    return;
+  }
+
+  element.focus();
+  if (
+    selection &&
+    typeof element.setSelectionRange === 'function' &&
+    typeof element.value === 'string'
+  ) {
+    const length = element.value.length;
+    const start = Math.min(selection.start, length);
+    const end = Math.min(selection.end, length);
+    element.setSelectionRange(start, end);
+  }
 }
 
 function updateState(partial) {
@@ -263,15 +304,15 @@ function renderProductDetail() {
     <form id="productForm" class="form-grid" autocomplete="off">
       <div class="form-row">
         <label for="productName">Nombre</label>
-        <input type="text" id="productName" value="${product.nombre}" required />
+        <input type="text" id="productName" value="${product.nombre}" required data-preserve-focus />
       </div>
       <div class="form-row">
         <label for="productUnit">Unidad de salida</label>
-        <input type="text" id="productUnit" value="${product.unidad_salida || ''}" />
+        <input type="text" id="productUnit" value="${product.unidad_salida || ''}" data-preserve-focus />
       </div>
       <div class="form-row">
         <label for="productOutput">Cantidad de salida</label>
-        <input type="number" id="productOutput" value="${product.cantidad_salida}" min="1" />
+        <input type="number" id="productOutput" value="${product.cantidad_salida}" min="1" data-preserve-focus />
       </div>
     </form>
     <div class="stats-grid" aria-live="polite">
@@ -828,22 +869,9 @@ function handleGlobalShortcuts(event) {
     return;
   }
 
-  const key = event.key.toLowerCase();
-  if (key === 'n') {
-    event.preventDefault();
-    createProduct();
-  }
-  if (key === 'd') {
-    event.preventDefault();
-    duplicateSelectedProduct();
-  }
-  if (key === 'f' || event.key === '/') {
+  if (event.key === '/') {
     event.preventDefault();
     document.getElementById('productSearch').focus();
-  }
-  if (key === 'i') {
-    event.preventDefault();
-    document.getElementById('ingredientName').focus();
   }
 }
 
