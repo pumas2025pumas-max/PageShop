@@ -929,11 +929,24 @@ function setupEvents() {
 
 function ensureSelection() {
   const current = state.seleccionado?.productoId ?? null;
-  const first = state.productos[0]?.id ?? null;
-  if (current === first) {
+  const productos = state.productos;
+
+  if (!productos.length) {
+    if (current !== null) {
+      updateState({ seleccionado: { productoId: null } });
+    }
     return;
   }
-  updateState({ seleccionado: { productoId: first } });
+
+  const hasCurrent = productos.some((prod) => prod.id === current);
+  if (hasCurrent) {
+    return;
+  }
+
+  const first = productos[0]?.id ?? null;
+  if (first !== null) {
+    updateState({ seleccionado: { productoId: first } });
+  }
 }
 
 function updateButtonsState() {
